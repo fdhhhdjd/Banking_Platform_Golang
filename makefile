@@ -5,7 +5,7 @@ export $(shell sed 's/=.*//' .env)
 # Folder constants
 DOCKER_COMPOSE := docker-compose.yml
 
-# Run auto
+################# DOCKER #################
 default:
 	docker ps
 
@@ -14,3 +14,13 @@ run-build:
 	
 run-down:
 	docker-compose -f $(DOCKER_COMPOSE) down
+
+################# SQLC #################
+sqlc:
+	sqlc generate
+
+################# GO #################
+test:
+	go test -v -cover ./...
+
+
