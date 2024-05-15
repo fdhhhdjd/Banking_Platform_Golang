@@ -1,6 +1,8 @@
-## STRUCTURE
+# STRUCTURE
 
 ![Structure GO and framework GIN](assets/structure-go-gin.png)
+
+# [Build Scalable RESTFUL API with Golang Gin Gonic Framework](https://medium.com/@wahyubagus1910/build-scalable-restful-api-with-golang-gin-gonic-framework-43793c730d10)
 
 # 1. VERSION VIETNAM
 
