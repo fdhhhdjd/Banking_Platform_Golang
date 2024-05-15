@@ -1,0 +1,20 @@
+type: "Config Application"
+development:
+  server:
+    port: 5000
+  database:
+    host: localhost
+    port: 5432
+    user: teacher_tai
+    password: teacher_tai
+    name: service_banking
+
+production:
+  server:
+    port: 8000
+  database:
+    host: localhost
+    port: 5432
+    user: teacher_tai
+    password: teacher_tai
+    name: service_banking

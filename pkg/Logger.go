@@ -1,4 +1,4 @@
-package config
+package logger_pkg
 
 import (
 	"os"
