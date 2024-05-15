@@ -2,12 +2,17 @@
 include .env
 export $(shell sed 's/=.*//' .env)
 
+
+DB_URL=postgresql://$$POSTGRES_USER:$$POSTGRES_PASSWORD@localhost:$$POSTGRES_PORT_MAPPING/$$POSTGRES_DB?sslmode=disable
+
 # Folder constants
 DOCKER_COMPOSE := docker-compose.yml
 
-################# DOCKER #################
+################# TEST #################
 default:
-	docker ps
+	echo "$(DB_URL)"
+
+################# DOCKER #################
 
 run-build:
 	docker-compose -f $(DOCKER_COMPOSE) up -d --build
@@ -24,3 +29,6 @@ test:
 	go test -v -cover ./...
 
 
+################# SQL #################
+migrateup:
+	migrate -path db/migration -database "$(DB_URL)" -verbose up
