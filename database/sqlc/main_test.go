@@ -11,18 +11,25 @@ import (
 
 const (
 	dbDriver = "postgres"
-	dbSource = "postgresql://taidev:eGMWFMa5gaAX1nfS229w@localhost:5432/service_banking?sslmode=disable"
+	dbSource = "postgresql://taidev:eGMWFMa5gaAX1nfS229w@localhost:54333/service_banking?sslmode=disable"
 )
 
 var testQueries *Queries
+var testDB *sql.DB
 
 func TestMain(m *testing.M) {
-	conn, err := sql.Open(dbDriver, dbSource)
+	var err error
+
+	testDB, err = sql.Open(dbDriver, dbSource)
 	if err != nil {
 		log.Fatal("Can't connect to database: ", err)
 	}
 
-	testQueries = New(conn)
+	if err = testDB.Ping(); err != nil {
+		log.Fatal("Can't ping the database: ", err)
+	}
+
+	testQueries = New(testDB)
 
 	os.Exit(m.Run())
 }
