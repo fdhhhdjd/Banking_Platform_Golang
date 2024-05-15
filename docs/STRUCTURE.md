@@ -1,8 +1,16 @@
+# ** NOTE ** ( Nothing is standard only the fit)
+
 # STRUCTURE
 
-![Structure GO and framework GIN](assets/structure-go-gin.png)
+- TH1:
+  ![Structure GO and framework GIN](assets/structure-go-gin.png)
+
+- TH2
+  ![Structure GO and framework GIN](assets/Structure2.png)
 
 # [Build Scalable RESTFUL API with Golang Gin Gonic Framework](https://medium.com/@wahyubagus1910/build-scalable-restful-api-with-golang-gin-gonic-framework-43793c730d10)
+
+# [Github Standard](https://github.com/golang-standards/project-layout)
 
 # 1. VERSION VIETNAM
 

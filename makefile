@@ -25,6 +25,8 @@ sqlc:
 	sqlc generate
 
 ################# GO #################
+run:
+	go run ./cmd/main.go
 test:
 	go test -v -cover ./...
 
