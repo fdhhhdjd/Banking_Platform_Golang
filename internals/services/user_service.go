@@ -1,4 +1,4 @@
-package user_services
+package services
 
 import (
 	error_response "github.com/fdhhhdjd/Banking_Platform_Golang/api/handler/error"
