@@ -36,13 +36,13 @@ func Server() {
 	}
 	server.GET("/ping", Pong)
 
+	routes.SetupRoutes(server)
+
 	// 404 - Not Found
 	server.NoRoute(NotFound())
 
 	// 500 - Internal Server Error
 	server.Use(ServerError)
-
-	routes.SetupRoutes(server)
 
 	server.Run(":" + port)
 }
@@ -66,10 +66,11 @@ func NotFound() gin.HandlerFunc {
 	}
 }
 
-var log = logrus.New()
-
 func ServerError(c *gin.Context) {
 	c.Next()
+
+	log := logrus.New()
+
 	if len(c.Errors) > 0 {
 		err := c.Errors[0].Err
 		status := http.StatusInternalServerError

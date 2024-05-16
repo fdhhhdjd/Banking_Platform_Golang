@@ -11,7 +11,7 @@ func GetAllUsers(c *gin.Context) []models.User {
 		{ID: 1, Name: "Nguyen Tien Tai", Email: "tai@example.com"},
 	}
 
-	if len(users) > 0 {
+	if len(users) == 0 {
 		errorResponse := error_response.NotFoundError("Not Found")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
