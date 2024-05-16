@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -20,7 +21,7 @@ import (
 func init() {
 	godotenv.Load()
 	logger_pkg.InitLog()
-	config.LoadConfig()
+	config.LoadConfig("configs")
 }
 
 func Server() {
@@ -34,6 +35,9 @@ func Server() {
 	if port == "" {
 		port = strconv.Itoa(config.AppConfig.Server.Port)
 	}
+
+	log.Println(config.AppConfig.Server.Port)
+
 	server.GET("/ping", Pong)
 
 	routes.SetupRoutes(server)

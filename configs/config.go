@@ -17,20 +17,21 @@ type Config struct {
 		User     string
 		Password string
 		Name     string
+		Ssl      string
 	}
 }
 
 var AppConfig Config
 
-func LoadConfig() {
+func LoadConfig(path string) {
 	env := os.Getenv("ENV")
 	if env == "" {
 		env = "development"
 	}
 
+	viper.AddConfigPath(path)
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("configs")
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
