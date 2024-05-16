@@ -8,7 +8,7 @@ import (
 
 func GetAllUsers() ([]models.User, error) {
 	users := []models.User{
-		{ID: 1, Name: "John Doe", Email: "john@example.com"},
+		{ID: 1, Name: "Nguyen Tien Tai", Email: "tai@example.com"},
 	}
 
 	if len(users) == 0 {
