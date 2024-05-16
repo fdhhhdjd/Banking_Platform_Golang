@@ -1,8 +1,6 @@
 package server
 
 import (
-	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -11,6 +9,7 @@ import (
 	error_response "github.com/fdhhhdjd/Banking_Platform_Golang/api/handler/error"
 	config "github.com/fdhhhdjd/Banking_Platform_Golang/configs"
 	routes "github.com/fdhhhdjd/Banking_Platform_Golang/internals/routers"
+	util "github.com/fdhhhdjd/Banking_Platform_Golang/internals/utils"
 	logger_pkg "github.com/fdhhhdjd/Banking_Platform_Golang/pkg"
 	"github.com/gin-gonic/gin"
 
@@ -36,7 +35,7 @@ func Server() {
 	}
 	server.GET("/ping", Pong)
 
-	// 404
+	// 404 - Not Found
 	server.NoRoute(NotFound())
 
 	// 500 - Internal Server Error
@@ -47,17 +46,18 @@ func Server() {
 	server.Run(":" + port)
 }
 
-var ErrDivideByZero = errors.New("divide by zero")
-
 func Pong(c *gin.Context) {
-	currentTime := strconv.FormatInt(time.Now().Unix(), 10)
-	message := fmt.Sprintf("Pong %s Hello Tai Dev", currentTime)
+	currentTime := time.Now().Unix()
+	signal := "Nguyen Tien Tai"
+	message := util.P("Pong %s", signal)
+
 	c.JSON(http.StatusOK, gin.H{
 		"status":  200,
 		"message": message,
 		"time":    currentTime,
 	})
 }
+
 func NotFound() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		errorResponse := error_response.NotFoundError("Not Found")
