@@ -12,6 +12,7 @@ import (
 	util "github.com/fdhhhdjd/Banking_Platform_Golang/internals/utils"
 	logger_pkg "github.com/fdhhhdjd/Banking_Platform_Golang/pkg"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 
 	"github.com/joho/godotenv"
 )
@@ -39,7 +40,7 @@ func Server() {
 	server.NoRoute(NotFound())
 
 	// 500 - Internal Server Error
-	server.Use(ServerError())
+	server.Use(ServerError)
 
 	routes.SetupRoutes(server)
 
@@ -65,8 +66,22 @@ func NotFound() gin.HandlerFunc {
 	}
 }
 
-func ServerError() gin.HandlerFunc {
-	return func(c *gin.Context) {
+var log = logrus.New()
+
+func ServerError(c *gin.Context) {
+	c.Next()
+	if len(c.Errors) > 0 {
+		err := c.Errors[0].Err
+		status := http.StatusInternalServerError
+
+		logEntry := log.WithFields(logrus.Fields{
+			"status":  status,
+			"method":  c.Request.Method,
+			"path":    c.Request.URL.Path,
+			"time":    time.Now(),
+			"request": c.Request.RequestURI,
+		})
+		logEntry.Error(err)
 		errorResponse := error_response.InternalServerError("Internal Server Error")
 		c.JSON(errorResponse.Status, errorResponse)
 	}
