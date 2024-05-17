@@ -25,3 +25,13 @@ func CreateAccount(c *gin.Context) error {
 
 	return nil
 }
+
+func GetAccount(c *gin.Context) error {
+	account := services.GetAccount(c)
+	if account == nil {
+		return nil
+	}
+	success_response.Ok(c, "Get Account", account)
+
+	return nil
+}

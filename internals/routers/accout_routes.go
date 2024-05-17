@@ -12,4 +12,7 @@ func AccountRoutes(router *gin.Engine) {
 
 	//* Created account
 	router.POST("/account", handle.AsyncHandler(controller.CreateAccount))
+
+	//* Get account
+	router.GET("/account/:id", handle.AsyncHandler(controller.GetAccount))
 }

@@ -79,3 +79,32 @@ func CreateAccount(c *gin.Context) *models.Account {
 
 	return &newAccount
 }
+
+func GetAccount(c *gin.Context) *models.Account {
+	var req models.GetAccountRequest
+
+	if err := c.ShouldBindUri(&req); err != nil {
+		errorResponse := error_response.NotFoundError("Not Found")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+	store := db.GetStore()
+
+	account, err := store.GetAccount(c, req.ID)
+
+	if err != nil {
+		errorResponse := error_response.NotFoundError("Not Found")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	newAccount := models.Account{
+		ID:        account.ID,
+		Owner:     account.Owner,
+		Balance:   account.Balance,
+		Currency:  account.Currency,
+		CreatedAt: account.CreatedAt,
+	}
+
+	return &newAccount
+}
