@@ -9,11 +9,8 @@ import (
 )
 
 func GetAllAccount(c *gin.Context) []models.Account {
-	type listAccountRequest struct {
-		PageID   int32 `form:"page_id" binding:"required,min=1"`
-		PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
-	}
-	var req listAccountRequest
+
+	var req models.ListAccountRequest
 
 	if err := c.ShouldBindQuery(&req); err != nil {
 		errorResponse := error_response.NotFoundError("Not Found")
@@ -21,16 +18,15 @@ func GetAllAccount(c *gin.Context) []models.Account {
 		return nil
 	}
 
-	ctx := c.Request.Context()
 	arg := database.ListAccountsParams{
-		Owner:  "pitdjj", // Example user dummy
+		Owner:  "Taidev", // Example user dummy
 		Limit:  req.PageSize,
 		Offset: (req.PageID - 1) * req.PageSize,
 	}
 
 	store := db.GetStore()
 
-	accounts, err := store.ListAccounts(ctx, arg)
+	accounts, err := store.ListAccounts(c, arg)
 	if err != nil {
 		errorResponse := error_response.NotFoundError("Not Found")
 		c.JSON(errorResponse.Status, errorResponse)
@@ -47,4 +43,39 @@ func GetAllAccount(c *gin.Context) []models.Account {
 	}
 
 	return result
+}
+
+func CreateAccount(c *gin.Context) *models.Account {
+	var req models.CreateAccountRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		errorResponse := error_response.NotFoundError("Not Found")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	store := db.GetStore()
+
+	arg := database.CreateAccountParams{
+		Owner:    req.Owner,
+		Balance:  0,
+		Currency: req.Currency,
+	}
+
+	accounts, err := store.CreateAccount(c, arg)
+	if err != nil {
+		errorResponse := error_response.NotFoundError("Not Found")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	newAccount := models.Account{
+		ID:        accounts.ID,
+		Owner:     accounts.Owner,
+		Balance:   accounts.Balance,
+		Currency:  accounts.Currency,
+		CreatedAt: accounts.CreatedAt,
+	}
+
+	return &newAccount
 }
