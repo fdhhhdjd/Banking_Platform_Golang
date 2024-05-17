@@ -6,13 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Hàm mẫu mô phỏng trả về lỗi
-
 func SetupRoutes(router *gin.Engine) {
 	//* Users
 	router.GET("/users", handle.AsyncHandler(controller.GetUsers))
 
 	//* Entries
 	router.GET("/entries", handle.AsyncHandler(controller.GetAllEntries))
+
+	//* Account
+	router.GET("/account", handle.AsyncHandler(controller.GetAllAccount))
 
 }

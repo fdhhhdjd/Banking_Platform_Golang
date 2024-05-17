@@ -9,6 +9,7 @@ import (
 
 	error_response "github.com/fdhhhdjd/Banking_Platform_Golang/api/handler/error"
 	config "github.com/fdhhhdjd/Banking_Platform_Golang/configs"
+	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/db"
 	routes "github.com/fdhhhdjd/Banking_Platform_Golang/internals/routers"
 	util "github.com/fdhhhdjd/Banking_Platform_Golang/internals/utils"
 	logger_pkg "github.com/fdhhhdjd/Banking_Platform_Golang/pkg"
@@ -22,6 +23,12 @@ func init() {
 	godotenv.Load()
 	logger_pkg.InitLog()
 	config.LoadConfig("configs")
+
+	// DB
+	err := db.InitStore()
+	if err != nil {
+		log.Fatalf("Could not connect to the database: %v", err)
+	}
 }
 
 func Server() {
