@@ -60,3 +60,10 @@ func InternalServerError(message string) *ErrorResponse {
 	}
 	return NewErrorResponse(message, http.StatusInternalServerError)
 }
+
+func ServiceUnavailable(message string) *ErrorResponse {
+	if message == "" {
+		message = http.StatusText(http.StatusServiceUnavailable)
+	}
+	return NewErrorResponse(message, http.StatusServiceUnavailable)
+}

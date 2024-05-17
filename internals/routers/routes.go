@@ -13,4 +13,7 @@ func SetupRoutes(router *gin.Engine) {
 
 	//* Account
 	AccountRoutes(router)
+
+	//* Transfer
+	TransferRoutes(router)
 }

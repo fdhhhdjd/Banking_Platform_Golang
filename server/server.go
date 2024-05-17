@@ -32,10 +32,13 @@ func init() {
 }
 
 func Server() {
-	server := gin.New()
+	// Todo: TH1 used New
+	// server := gin.New()
 	// Manually add middleware
-	server.Use(gin.Logger())
-	server.Use(gin.Recovery())
+	// server.Use(gin.Logger())
+	// server.Use(gin.Recovery())
+	// Todo: TH2 used Default
+	server := gin.Default()
 
 	port := os.Getenv("PORT")
 
@@ -94,7 +97,7 @@ func ServerError(c *gin.Context) {
 			"request": c.Request.RequestURI,
 		})
 		logEntry.Error(err)
-		errorResponse := error_response.InternalServerError("Internal Server Error")
+		errorResponse := error_response.ServiceUnavailable("Service Unavailable")
 		c.JSON(errorResponse.Status, errorResponse)
 	}
 }

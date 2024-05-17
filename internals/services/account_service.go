@@ -13,7 +13,7 @@ func GetAllAccount(c *gin.Context) []models.Account {
 	var req models.ListAccountRequest
 
 	if err := c.ShouldBindQuery(&req); err != nil {
-		errorResponse := error_response.NotFoundError("Not Found")
+		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
@@ -28,7 +28,7 @@ func GetAllAccount(c *gin.Context) []models.Account {
 
 	accounts, err := store.ListAccounts(c, arg)
 	if err != nil {
-		errorResponse := error_response.NotFoundError("Not Found")
+		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
@@ -49,7 +49,7 @@ func CreateAccount(c *gin.Context) *models.Account {
 	var req models.CreateAccountRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errorResponse := error_response.NotFoundError("Not Found")
+		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
@@ -64,7 +64,7 @@ func CreateAccount(c *gin.Context) *models.Account {
 
 	accounts, err := store.CreateAccount(c, arg)
 	if err != nil {
-		errorResponse := error_response.NotFoundError("Not Found")
+		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
@@ -84,7 +84,7 @@ func GetAccount(c *gin.Context) *models.Account {
 	var req models.GetAccountRequest
 
 	if err := c.ShouldBindUri(&req); err != nil {
-		errorResponse := error_response.NotFoundError("Not Found")
+		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
@@ -93,7 +93,7 @@ func GetAccount(c *gin.Context) *models.Account {
 	account, err := store.GetAccount(c, req.ID)
 
 	if err != nil {
-		errorResponse := error_response.NotFoundError("Not Found")
+		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
