@@ -7,6 +7,10 @@ import (
 )
 
 func UserRoutes(router *gin.Engine) {
-	//* Entries
+	//* All
 	router.GET("/users", handle.AsyncHandler(controllers.GetUsers))
+
+	//* Create
+	router.POST("/users/register", handle.AsyncHandler(controllers.Register))
+
 }

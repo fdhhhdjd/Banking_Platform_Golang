@@ -53,6 +53,13 @@ func GoneError(message string) *ErrorResponse {
 	return NewErrorResponse(message, http.StatusGone)
 }
 
+func ForbiddenError(message string) *ErrorResponse {
+	if message == "" {
+		message = http.StatusText(http.StatusForbidden)
+	}
+	return NewErrorResponse(message, http.StatusForbidden)
+}
+
 // InternalServerError represents a 500 Internal Server Error
 func InternalServerError(message string) *ErrorResponse {
 	if message == "" {
