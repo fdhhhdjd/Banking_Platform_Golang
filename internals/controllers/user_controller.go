@@ -25,10 +25,10 @@ func Register(c *gin.Context) error {
 }
 
 func Login(c *gin.Context) error {
-	registerUser := user_services.RegisterUser(c)
-	if registerUser == nil {
+	loginUser := user_services.LoginUser(c)
+	if loginUser == nil {
 		return nil
 	}
-	success_response.Created(c, "Register", registerUser)
+	success_response.Created(c, "Login", loginUser)
 	return nil
 }

@@ -6,5 +6,6 @@
   "editor.autoClosingQuotes": "always",
   "[go]": {
     "editor.defaultFormatter": "golang.go"
-  }
+  },
+  "cSpell.words": ["fdhhhdjd"]
 }

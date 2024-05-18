@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -18,6 +19,10 @@ type Config struct {
 		Password string
 		Name     string
 		Ssl      string
+	}
+	Auth struct {
+		AccessTokenDuration  time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+		RefreshTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
 	}
 }
 

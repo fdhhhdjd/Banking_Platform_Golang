@@ -3,11 +3,12 @@ package services
 import (
 	error_response "github.com/fdhhhdjd/Banking_Platform_Golang/api/handler/error"
 	handle "github.com/fdhhhdjd/Banking_Platform_Golang/api/handler/handler"
+	config "github.com/fdhhhdjd/Banking_Platform_Golang/configs"
 	database "github.com/fdhhhdjd/Banking_Platform_Golang/database/sqlc"
+	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/auth"
 	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/constants"
 	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/db"
 	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/models"
-	util "github.com/fdhhhdjd/Banking_Platform_Golang/internals/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,7 +35,7 @@ func RegisterUser(c *gin.Context) *database.User {
 		return nil
 	}
 
-	hashedPassword, err := util.EncodePassword(req.Password)
+	hashedPassword, err := auth.EncodePassword(req.Password)
 
 	if err != nil {
 		errorResponse := error_response.NotFoundError("Not Found")
@@ -75,23 +76,71 @@ func LoginUser(c *gin.Context) *models.LoginUserResponse {
 		return nil
 	}
 
-	// store := db.GetStore()
+	store := db.GetStore()
 
-	// user, err := store.GetUser(c, req.Username)
+	user, err := store.GetUser(c, req.Username)
 
-	// if err != nil {
-	// 	if err != nil {
-	// 		errCode := handle.ErrorCode(err)
-	// 		if errCode == constants.ForeignKeyViolation || errCode == constants.UniqueViolation {
-	// 			errorResponse := error_response.ForbiddenError(errCode)
-	// 			c.JSON(errorResponse.Status, errorResponse)
-	// 			return nil
-	// 		}
-	// 		errorResponse := error_response.InternalServerError("")
-	// 		c.JSON(errorResponse.Status, errorResponse)
-	// 		return nil
-	// 	}
-	// }
+	if err != nil {
+		if err != nil {
+			errCode := handle.ErrorCode(err)
+			if errCode == constants.ForeignKeyViolation || errCode == constants.UniqueViolation {
+				errorResponse := error_response.ForbiddenError(errCode)
+				c.JSON(errorResponse.Status, errorResponse)
+				return nil
+			}
+			errorResponse := error_response.InternalServerError("")
+			c.JSON(errorResponse.Status, errorResponse)
+			return nil
+		}
+	}
+	if err != nil {
+		errorResponse := error_response.NotFoundError("Not Found")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+	if err != nil {
+		errorResponse := error_response.NotFoundError("Not Found")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
 
-	return nil
+	accessToken, accessPayload, err := auth.GetJWTMaker().CreateToken(
+		user.Username,
+		user.Role,
+		config.AppConfig.Auth.AccessTokenDuration,
+	)
+
+	if err != nil {
+		errorResponse := error_response.InternalServerError("")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	refreshToken, refreshPayload, err := auth.GetJWTMaker().CreateToken(
+		user.Username,
+		user.Role,
+		config.AppConfig.Auth.RefreshTokenDuration,
+	)
+
+	if err != nil {
+		errorResponse := error_response.InternalServerError("")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	rsp := models.LoginUserResponse{
+		AccessToken:           accessToken,
+		RefreshToken:          refreshToken,
+		AccessTokenExpiresAt:  accessPayload.ExpiredAt,
+		RefreshTokenExpiresAt: refreshPayload.ExpiredAt,
+		User: models.UserResponse{
+			Username:          user.Username,
+			Email:             user.Email,
+			FullName:          user.FullName,
+			PasswordChangedAt: user.PasswordChangedAt,
+			CreatedAt:         user.CreatedAt,
+		},
+	}
+
+	return &rsp
 }
