@@ -23,6 +23,7 @@ type Config struct {
 	Auth struct {
 		AccessTokenDuration  time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 		RefreshTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
+		SecretKey            string        `mapstructure:"SECRET_KEY_TOKEN"`
 	}
 }
 

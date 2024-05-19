@@ -34,7 +34,11 @@ dev:
 test:
 	go test -v -cover ./...
 
-
 ################# SQL #################
 migrateup:
 	migrate -path db/migration -database "$(DB_URL)" -verbose up
+
+
+################# JWT #################
+sereckey: 
+	node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"

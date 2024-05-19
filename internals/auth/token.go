@@ -1,16 +1,12 @@
 package auth
 
-import "log"
+var JwtMaker Maker
 
-var jwtMaker Maker
-
-func GetJWTMaker() Maker {
-	// TOKEN
-	secretKey := "123123123213213131231232132132131231231232"
-	var err error
-	jwtMaker, err = NewJWTMaker(secretKey)
+func GetJWTMaker() (Maker, error) {
+	secretKey := "6892e55f3d2d1fae3665a0fa6586987cc4c4f3c3a5ff2adb1bd36a6351a24e2d"
+	JwtMaker, err := NewJWTMaker(secretKey)
 	if err != nil {
-		log.Fatalf("Failed to create JWT Maker: %v", err)
+		return nil, err
 	}
-	return jwtMaker
+	return JwtMaker, nil
 }

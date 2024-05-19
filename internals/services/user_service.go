@@ -18,7 +18,7 @@ func GetAllUsers(c *gin.Context) []models.User {
 	}
 
 	if len(users) == 0 {
-		errorResponse := error_response.NotFoundError("Not Found")
+		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
@@ -30,7 +30,7 @@ func RegisterUser(c *gin.Context) *database.User {
 	var req models.CreateUserRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errorResponse := error_response.NotFoundError("Not Found")
+		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
@@ -38,7 +38,7 @@ func RegisterUser(c *gin.Context) *database.User {
 	hashedPassword, err := auth.EncodePassword(req.Password)
 
 	if err != nil {
-		errorResponse := error_response.NotFoundError("Not Found")
+		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
@@ -71,7 +71,7 @@ func RegisterUser(c *gin.Context) *database.User {
 func LoginUser(c *gin.Context) *models.LoginUserResponse {
 	var req models.LoginUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errorResponse := error_response.NotFoundError("Not Found")
+		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
@@ -94,17 +94,23 @@ func LoginUser(c *gin.Context) *models.LoginUserResponse {
 		}
 	}
 	if err != nil {
-		errorResponse := error_response.NotFoundError("Not Found")
+		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
 	if err != nil {
-		errorResponse := error_response.NotFoundError("Not Found")
+		errorResponse := error_response.BadRequestError("Bad Request")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+	JwtMaker, err := auth.GetJWTMaker()
+	if err != nil {
+		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
 
-	accessToken, accessPayload, err := auth.GetJWTMaker().CreateToken(
+	accessToken, accessPayload, err := JwtMaker.CreateToken(
 		user.Username,
 		user.Role,
 		config.AppConfig.Auth.AccessTokenDuration,
@@ -116,7 +122,7 @@ func LoginUser(c *gin.Context) *models.LoginUserResponse {
 		return nil
 	}
 
-	refreshToken, refreshPayload, err := auth.GetJWTMaker().CreateToken(
+	refreshToken, refreshPayload, err := JwtMaker.CreateToken(
 		user.Username,
 		user.Role,
 		config.AppConfig.Auth.RefreshTokenDuration,
