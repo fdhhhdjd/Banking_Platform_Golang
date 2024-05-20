@@ -2,13 +2,15 @@ package models
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type User struct {
-	ID           uint   `json:"id"`
-	Name         string `json:"name"`
-	Email        string `json:"email"`
-	RefetchToken string `json:"refetch_token"`
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	Email        string    `json:"email"`
+	RefetchToken string    `json:"refetch_token"`
 }
 
 type CreateUserRequest struct {

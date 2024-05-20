@@ -24,3 +24,9 @@ const (
 const (
 	KeyRefetchToken = "refetchToken"
 )
+
+const (
+	AuthorizationHeaderKey  = "authorization"
+	AuthorizationTypeBearer = "bearer"
+	AuthorizationPayloadKey = "authorization_payload"
+)

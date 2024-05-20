@@ -4,12 +4,14 @@ import "os"
 
 var JwtMaker Maker
 
-func GetJWTMaker() (Maker, error) {
-
+func init() {
 	secretKey := os.Getenv("SECRET_KEY_TOKEN")
-	JwtMaker, err := NewJWTMaker(secretKey)
+	var err error
+	JwtMaker, err = NewJWTMaker(secretKey)
 	if err != nil {
-		return nil, err
+		panic("failed to create JWT maker: " + err.Error())
 	}
+}
+func GetJWTMaker() (Maker, error) {
 	return JwtMaker, nil
 }

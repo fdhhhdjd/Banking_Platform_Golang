@@ -10,7 +10,7 @@ import (
 )
 
 func TransferRoutes(router *gin.Engine) {
-
+	//* Check validator
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("currency", helpers.ValidCurrency)
 	}

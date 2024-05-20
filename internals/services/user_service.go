@@ -16,6 +16,7 @@ import (
 )
 
 func GetAllUsers(c *gin.Context) []models.User {
+	//* Get Cookie
 	resultRefetch, err := c.Cookie(constants.KeyRefetchToken)
 
 	if err != nil {
@@ -24,8 +25,24 @@ func GetAllUsers(c *gin.Context) []models.User {
 		return nil
 	}
 
+	//* Get Info for accessToken
+	payload, exists := c.Get("info_user")
+
+	if !exists {
+		errorResponse := error_response.BadRequestError("Bad Request")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+	payloadPtr, ok := payload.(*auth.Payload)
+
+	if !ok {
+		errorResponse := error_response.BadRequestError("Bad Request")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
 	users := []models.User{
-		{ID: 1, Name: "Nguyen Tien Tai", Email: "tai@example.com", RefetchToken: resultRefetch},
+		{ID: payloadPtr.ID, Name: payloadPtr.Username, Email: "tai@gmail.com", RefetchToken: resultRefetch},
 	}
 
 	if len(users) == 0 {
