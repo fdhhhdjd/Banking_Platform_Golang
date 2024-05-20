@@ -4,6 +4,8 @@ FROM golang:1.22.3-alpine
 # Add Maintainer Info
 LABEL maintainer="Nguyen Tien Tai <nguyentientai10@gmail.com>"
 
+RUN apk add --no-cache curl
+
 # Set the Current Working Directory inside the container
 WORKDIR /app
 

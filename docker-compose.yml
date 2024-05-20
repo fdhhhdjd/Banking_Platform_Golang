@@ -45,6 +45,12 @@ services:
       - postgresql # This service depends on postgresql. Start that first.
     networks: # Networks to join (Services on the same network can communicate with each other using their name)
       - service_banking-network
+    healthcheck:
+      test:
+        ["CMD", "sh", "-c", "curl -sSf http://${HOST}:${PORT}/ping > /dev/null"]
+      interval: 60s
+      timeout: 2s
+      retries: 3
 
 volumes:
   db_data:
