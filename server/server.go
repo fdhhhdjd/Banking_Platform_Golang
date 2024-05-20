@@ -47,8 +47,6 @@ func Server() {
 		port = strconv.Itoa(config.AppConfig.Server.Port)
 	}
 
-	log.Println(config.AppConfig.Server.Port)
-
 	server.GET("/ping", Pong)
 
 	routes.SetupRoutes(server)

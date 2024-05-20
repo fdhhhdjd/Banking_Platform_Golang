@@ -1,4 +1,4 @@
 *.log
-.env
+*.env
 go.sum
 configs/config.yaml

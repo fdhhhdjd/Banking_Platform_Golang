@@ -3,8 +3,8 @@ package config
 import (
 	"log"
 	"os"
-	"time"
 
+	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/constants"
 	"github.com/spf13/viper"
 )
 
@@ -20,11 +20,6 @@ type Config struct {
 		Name     string
 		Ssl      string
 	}
-	Auth struct {
-		AccessTokenDuration  time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
-		RefreshTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
-		SecretKey            string        `mapstructure:"SECRET_KEY_TOKEN"`
-	}
 }
 
 var AppConfig Config
@@ -32,7 +27,7 @@ var AppConfig Config
 func LoadConfig(path string) {
 	env := os.Getenv("ENV")
 	if env == "" {
-		env = "development"
+		env = constants.DEV
 	}
 
 	viper.AddConfigPath(path)

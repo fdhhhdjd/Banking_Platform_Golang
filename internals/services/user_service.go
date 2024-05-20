@@ -1,9 +1,12 @@
 package services
 
 import (
+	"os"
+	"strings"
+	"time"
+
 	error_response "github.com/fdhhhdjd/Banking_Platform_Golang/api/handler/error"
 	handle "github.com/fdhhhdjd/Banking_Platform_Golang/api/handler/handler"
-	config "github.com/fdhhhdjd/Banking_Platform_Golang/configs"
 	database "github.com/fdhhhdjd/Banking_Platform_Golang/database/sqlc"
 	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/auth"
 	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/constants"
@@ -81,29 +84,54 @@ func LoginUser(c *gin.Context) *models.LoginUserResponse {
 	user, err := store.GetUser(c, req.Username)
 
 	if err != nil {
-		if err != nil {
-			errCode := handle.ErrorCode(err)
-			if errCode == constants.ForeignKeyViolation || errCode == constants.UniqueViolation {
-				errorResponse := error_response.ForbiddenError(errCode)
-				c.JSON(errorResponse.Status, errorResponse)
-				return nil
-			}
-			errorResponse := error_response.InternalServerError("")
+		errCode := handle.ErrorCode(err)
+		if errCode == constants.ForeignKeyViolation || errCode == constants.UniqueViolation {
+			errorResponse := error_response.ForbiddenError(errCode)
 			c.JSON(errorResponse.Status, errorResponse)
 			return nil
 		}
+		errorResponse := error_response.InternalServerError("Internal Server Error")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
 	}
+
 	if err != nil {
 		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
+
 	if err != nil {
 		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
+
 	JwtMaker, err := auth.GetJWTMaker()
+	if err != nil {
+		errorResponse := error_response.BadRequestError("Bad Request")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	accessTokenDurationStr := os.Getenv("ACCESS_TOKEN_DURATION")
+	refetchTokenDurationStr := os.Getenv("REFRESH_TOKEN_DURATION")
+
+	accessTokenDuration, err := time.ParseDuration(accessTokenDurationStr)
+	if err != nil {
+		errorResponse := error_response.BadRequestError("Bad Request")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	refetchTokenDuration, err := time.ParseDuration(refetchTokenDurationStr)
+
+	if err != nil {
+		errorResponse := error_response.BadRequestError("Bad Request")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
 	if err != nil {
 		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
@@ -113,11 +141,11 @@ func LoginUser(c *gin.Context) *models.LoginUserResponse {
 	accessToken, accessPayload, err := JwtMaker.CreateToken(
 		user.Username,
 		user.Role,
-		config.AppConfig.Auth.AccessTokenDuration,
+		accessTokenDuration,
 	)
 
 	if err != nil {
-		errorResponse := error_response.InternalServerError("")
+		errorResponse := error_response.InternalServerError("Internal Server Error")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
@@ -125,14 +153,27 @@ func LoginUser(c *gin.Context) *models.LoginUserResponse {
 	refreshToken, refreshPayload, err := JwtMaker.CreateToken(
 		user.Username,
 		user.Role,
-		config.AppConfig.Auth.RefreshTokenDuration,
+		refetchTokenDuration,
 	)
 
 	if err != nil {
-		errorResponse := error_response.InternalServerError("")
+		errorResponse := error_response.InternalServerError("Internal Server Error")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
+
+	nodeEnv := os.Getenv("ENV")
+	domain := constants.HOST
+	secure := nodeEnv != constants.DEV
+
+	if nodeEnv != constants.DEV {
+		hostWithPort := c.Request.Host
+		parts := strings.Split(hostWithPort, ":")
+		domain = parts[0]
+	}
+
+	// Set cookie with access token
+	c.SetCookie(constants.KeyRefetchToken, refreshToken, int(refetchTokenDuration.Seconds()), "/", domain, secure, true)
 
 	rsp := models.LoginUserResponse{
 		AccessToken:           accessToken,

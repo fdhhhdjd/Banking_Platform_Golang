@@ -2,7 +2,6 @@ package handle
 
 import (
 	"errors"
-	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -23,7 +22,6 @@ func ErrorCode(err error) string {
 	}
 
 	var pgErr *pgconn.PgError
-	log.Println(pgErr)
 	if errors.As(err, &pgErr) && pgErr != nil {
 		return pgErr.Code
 	}

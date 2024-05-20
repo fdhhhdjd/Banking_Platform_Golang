@@ -1,6 +1,11 @@
 package constants
 
 const (
+	DEV  = "development"
+	HOST = "localhost"
+)
+
+const (
 	USD = "USD"
 	EUR = "EUR"
 	VND = "VND"
@@ -14,4 +19,8 @@ const (
 const (
 	ErrInvalidToken = "Token Is Invalid"
 	ErrExpiredToken = "Token Has Expired"
+)
+
+const (
+	KeyRefetchToken = "refetchToken"
 )

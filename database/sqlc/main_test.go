@@ -24,8 +24,6 @@ func TestMain(m *testing.M) {
 
 	dbSource := util.P("postgresql://%s:%s@%s:%s/%s?sslmode=%s", config.AppConfig.Database.User, config.AppConfig.Database.Password, config.AppConfig.Database.Host, strconv.Itoa(config.AppConfig.Database.Port), config.AppConfig.Database.Name, config.AppConfig.Database.Ssl)
 
-	log.Println(dbSource)
-
 	var err error
 
 	testDB, err = sql.Open(dbDriver, dbSource)
