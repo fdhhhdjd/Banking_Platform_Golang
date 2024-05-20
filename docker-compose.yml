@@ -13,7 +13,7 @@ services:
       PGDATA: "/data/postgres"
     volumes:
       - db_data/:/var/lib/postgresql/data/postgres:ro
-      # - ./database/migration/init:/docker-entrypoint-initdb.d/init.sql
+      - ./database/migration/init/init.sql:/docker-entrypoint-initdb.d/init.sql
     env_file:
       - .env
     ports:
@@ -29,6 +29,22 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
+  # TODO: 2. GOLANG
+  # App Service
+  app:
+    # Configuration for building the docker image for the service
+    restart: unless-stopped
+    build:
+      context: . # Use an image built from the specified dockerfile in the current directory.
+      dockerfile: ./docker/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${PORT}:${PORT}" # Forward the exposed port 8080 on the container to port 8080 on the host machine
+    depends_on:
+      - postgresql # This service depends on postgresql. Start that first.
+    networks: # Networks to join (Services on the same network can communicate with each other using their name)
+      - service_banking-network
 
 volumes:
   db_data:
