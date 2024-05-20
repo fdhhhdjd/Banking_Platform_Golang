@@ -121,18 +121,15 @@ func LoginUser(c *gin.Context) *models.LoginUserResponse {
 		return nil
 	}
 
-	if err != nil {
+	//* Check Password
+	DecodePassword := auth.DecodePassword(req.Password, user.HashedPassword)
+	if DecodePassword != nil {
 		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
 
-	if err != nil {
-		errorResponse := error_response.BadRequestError("Bad Request")
-		c.JSON(errorResponse.Status, errorResponse)
-		return nil
-	}
-
+	//* Handle Secret key token
 	JwtMaker, err := auth.GetJWTMaker()
 	if err != nil {
 		errorResponse := error_response.BadRequestError("Bad Request")
@@ -140,6 +137,7 @@ func LoginUser(c *gin.Context) *models.LoginUserResponse {
 		return nil
 	}
 
+	//* Handle create token
 	accessTokenDurationStr := os.Getenv("ACCESS_TOKEN_DURATION")
 	refetchTokenDurationStr := os.Getenv("REFRESH_TOKEN_DURATION")
 
@@ -158,12 +156,6 @@ func LoginUser(c *gin.Context) *models.LoginUserResponse {
 		return nil
 	}
 
-	if err != nil {
-		errorResponse := error_response.BadRequestError("Bad Request")
-		c.JSON(errorResponse.Status, errorResponse)
-		return nil
-	}
-
 	accessToken, accessPayload, err := JwtMaker.CreateToken(
 		user.Username,
 		user.Role,
@@ -171,7 +163,7 @@ func LoginUser(c *gin.Context) *models.LoginUserResponse {
 	)
 
 	if err != nil {
-		errorResponse := error_response.InternalServerError("Internal Server Error")
+		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
@@ -183,7 +175,7 @@ func LoginUser(c *gin.Context) *models.LoginUserResponse {
 	)
 
 	if err != nil {
-		errorResponse := error_response.InternalServerError("Internal Server Error")
+		errorResponse := error_response.BadRequestError("Bad Request")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
@@ -198,7 +190,7 @@ func LoginUser(c *gin.Context) *models.LoginUserResponse {
 		domain = parts[0]
 	}
 
-	// Set cookie with access token
+	//* Set cookie with access token
 	c.SetCookie(constants.KeyRefetchToken, refreshToken, int(refetchTokenDuration.Seconds()), "/", domain, secure, true)
 
 	rsp := models.LoginUserResponse{
