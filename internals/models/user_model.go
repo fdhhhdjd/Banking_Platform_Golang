@@ -5,9 +5,10 @@ import (
 )
 
 type User struct {
-	ID    uint   `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	ID           uint   `json:"id"`
+	Name         string `json:"name"`
+	Email        string `json:"email"`
+	RefetchToken string `json:"refetch_token"`
 }
 
 type CreateUserRequest struct {

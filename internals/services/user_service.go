@@ -16,8 +16,16 @@ import (
 )
 
 func GetAllUsers(c *gin.Context) []models.User {
+	resultRefetch, err := c.Cookie(constants.KeyRefetchToken)
+
+	if err != nil {
+		errorResponse := error_response.BadRequestError("Bad Request")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
 	users := []models.User{
-		{ID: 1, Name: "Nguyen Tien Tai", Email: "tai@example.com"},
+		{ID: 1, Name: "Nguyen Tien Tai", Email: "tai@example.com", RefetchToken: resultRefetch},
 	}
 
 	if len(users) == 0 {
@@ -68,6 +76,7 @@ func RegisterUser(c *gin.Context) *database.User {
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
+
 	return &user
 }
 

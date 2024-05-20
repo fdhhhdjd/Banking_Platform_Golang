@@ -29,6 +29,6 @@ func Login(c *gin.Context) error {
 	if loginUser == nil {
 		return nil
 	}
-	success_response.Created(c, "Login", loginUser)
+	success_response.Ok(c, "Login", loginUser)
 	return nil
 }
