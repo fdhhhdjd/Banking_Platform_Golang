@@ -180,6 +180,24 @@ func LoginUser(c *gin.Context) *models.LoginUserResponse {
 		return nil
 	}
 
+	//* Save session account login
+	session, err := store.CreateSession(c, database.CreateSessionParams{
+		ID:           refreshPayload.ID,
+		Username:     user.Username,
+		RefreshToken: refreshToken,
+		UserAgent:    c.Request.UserAgent(),
+		ClientIp:     c.ClientIP(),
+		IsBlocked:    false,
+		ExpiresAt:    refreshPayload.ExpiredAt,
+	})
+
+	if err != nil {
+		errorResponse := error_response.InternalServerError("Internal Server Error")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	//* Set cookie with access token
 	nodeEnv := os.Getenv("ENV")
 	domain := constants.HOST
 	secure := nodeEnv != constants.DEV
@@ -194,6 +212,7 @@ func LoginUser(c *gin.Context) *models.LoginUserResponse {
 	c.SetCookie(constants.KeyRefetchToken, refreshToken, int(refetchTokenDuration.Seconds()), "/", domain, secure, true)
 
 	rsp := models.LoginUserResponse{
+		SessionID:             session.ID,
 		AccessToken:           accessToken,
 		RefreshToken:          refreshToken,
 		AccessTokenExpiresAt:  accessPayload.ExpiredAt,
@@ -205,6 +224,102 @@ func LoginUser(c *gin.Context) *models.LoginUserResponse {
 			PasswordChangedAt: user.PasswordChangedAt,
 			CreatedAt:         user.CreatedAt,
 		},
+	}
+
+	return &rsp
+}
+
+func RenewToken(c *gin.Context) *models.RenewAccessTokenResponse {
+	//* Check Input
+	var req models.RenewAccessTokenRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		errorResponse := error_response.BadRequestError("Bad Request")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	//* Handle check RefetchToken
+	JwtMaker, err := auth.GetJWTMaker()
+	if err != nil {
+		errorResponse := error_response.UnauthorizedError("")
+		c.AbortWithStatusJSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	RefreshPayload, err := JwtMaker.VerifyToken(req.RefreshToken)
+	if err != nil {
+		errorResponse := error_response.BadRequestError("Bad Request")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	//* Get info section Db
+	store := db.GetStore()
+	session, err := store.GetSession(c, RefreshPayload.ID)
+
+	if err != nil {
+		errCode := handle.ErrorCode(err)
+		if errCode == constants.ForeignKeyViolation || errCode == constants.UniqueViolation {
+			errorResponse := error_response.ForbiddenError(errCode)
+			c.JSON(errorResponse.Status, errorResponse)
+			return nil
+		}
+		errorResponse := error_response.InternalServerError("Internal Server Error")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	//* Check account have been block yet
+	if session.IsBlocked {
+		errorResponse := error_response.UnauthorizedError("")
+		c.AbortWithStatusJSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	//* Check account have in the same with username session
+	if session.Username != RefreshPayload.Username {
+		errorResponse := error_response.UnauthorizedError("")
+		c.AbortWithStatusJSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	//* Check refetch token not yet
+	if session.RefreshToken != req.RefreshToken {
+		errorResponse := error_response.UnauthorizedError("")
+		c.AbortWithStatusJSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	//* Check session have been expired yet
+	if time.Now().After(session.ExpiresAt) {
+		errorResponse := error_response.UnauthorizedError("")
+		c.AbortWithStatusJSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	//* Create accessToken new
+	accessTokenDurationStr := os.Getenv("ACCESS_TOKEN_DURATION")
+	accessTokenDuration, err := time.ParseDuration(accessTokenDurationStr)
+	if err != nil {
+		errorResponse := error_response.BadRequestError("Bad Request")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+	accessToken, accessPayload, err := JwtMaker.CreateToken(
+		RefreshPayload.Username,
+		RefreshPayload.Role,
+		accessTokenDuration,
+	)
+
+	if err != nil {
+		errorResponse := error_response.BadRequestError("Bad Request")
+		c.JSON(errorResponse.Status, errorResponse)
+		return nil
+	}
+
+	rsp := models.RenewAccessTokenResponse{
+		AccessToken:          accessToken,
+		AccessTokenExpiresAt: accessPayload.ExpiredAt,
 	}
 
 	return &rsp

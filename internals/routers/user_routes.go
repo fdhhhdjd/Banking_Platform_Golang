@@ -15,6 +15,9 @@ func UserRoutes(router *gin.Engine) {
 	//* Login
 	router.POST("/users/login", handle.AsyncHandler(controllers.Login))
 
+	//* Renew Token
+	router.GET("/users/renew-token", handle.AsyncHandler(controllers.RenewToken))
+
 	//* All
 	protected := router.Group("/", middlewares.AuthMiddleware())
 	{
