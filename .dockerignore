@@ -41,3 +41,6 @@ node_modules
 
 #unittest
 test
+
+#Log
+logs

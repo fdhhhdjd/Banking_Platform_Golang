@@ -43,6 +43,7 @@ services:
       - .env # Load environment variables from .env file
     environment:
       ENV: "production" # Port for the service
+      LOG_LEVEL: "info" # Logger
     ports:
       - "${PORT}:${PORT}" # Map the container port to the host port
     depends_on:

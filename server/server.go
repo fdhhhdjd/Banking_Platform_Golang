@@ -13,7 +13,7 @@ import (
 	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/db"
 	routes "github.com/fdhhhdjd/Banking_Platform_Golang/internals/routers"
 	util "github.com/fdhhhdjd/Banking_Platform_Golang/internals/utils"
-	logger_pkg "github.com/fdhhhdjd/Banking_Platform_Golang/pkg"
+	"github.com/fdhhhdjd/Banking_Platform_Golang/pkg"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 
@@ -22,7 +22,7 @@ import (
 
 func init() {
 	godotenv.Load()
-	logger_pkg.InitLog()
+	pkg.InitLog()
 	config.LoadConfig("configs")
 
 	// DB
@@ -43,9 +43,10 @@ func Server() {
 	nodeEnv := os.Getenv("ENV")
 	if nodeEnv != constants.DEV {
 		gin.SetMode(gin.ReleaseMode)
-
 	}
+
 	server := gin.Default()
+	server.Use(pkg.LogRequest)
 
 	port := os.Getenv("PORT")
 
@@ -87,21 +88,20 @@ func NotFound() gin.HandlerFunc {
 
 func ServerError(c *gin.Context) {
 	c.Next()
-
-	log := logrus.New()
-
 	if len(c.Errors) > 0 {
 		err := c.Errors[0].Err
 		status := http.StatusInternalServerError
+		requestId, _ := c.Get("requestId")
 
-		logEntry := log.WithFields(logrus.Fields{
-			"status":  status,
-			"method":  c.Request.Method,
-			"path":    c.Request.URL.Path,
-			"time":    time.Now(),
-			"request": c.Request.RequestURI,
-		})
-		logEntry.Error(err)
+		logrus.WithFields(logrus.Fields{
+			"status":    status,
+			"method":    c.Request.Method,
+			"path":      c.Request.URL.Path,
+			"time":      time.Now(),
+			"request":   c.Request.RequestURI,
+			"requestId": requestId,
+		}).Error(err)
+
 		errorResponse := error_response.ServiceUnavailable("Service Unavailable")
 		c.JSON(errorResponse.Status, errorResponse)
 	}

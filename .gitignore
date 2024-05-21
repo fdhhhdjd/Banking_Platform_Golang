@@ -3,3 +3,4 @@
 go.sum
 configs/config.yaml
 main
+logs
