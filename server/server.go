@@ -9,6 +9,7 @@ import (
 
 	error_response "github.com/fdhhhdjd/Banking_Platform_Golang/api/handler/error"
 	config "github.com/fdhhhdjd/Banking_Platform_Golang/configs"
+	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/constants"
 	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/db"
 	routes "github.com/fdhhhdjd/Banking_Platform_Golang/internals/routers"
 	util "github.com/fdhhhdjd/Banking_Platform_Golang/internals/utils"
@@ -39,6 +40,11 @@ func Server() {
 	// server.Use(gin.Logger())
 	// server.Use(gin.Recovery())
 	// Todo: TH2 used Default
+	nodeEnv := os.Getenv("ENV")
+	if nodeEnv != constants.DEV {
+		gin.SetMode(gin.ReleaseMode)
+
+	}
 	server := gin.Default()
 
 	port := os.Getenv("PORT")

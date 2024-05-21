@@ -1,61 +1,69 @@
 version: "3.8"
 
 services:
-  # TODO: 1. SQL
+  # TODO: 1. POSTGRESQL
   postgresql:
     container_name: postgresql
+    # Image version PG
     image: postgres:latest
+    # Not restart when db crashes
     restart: unless-stopped
     environment:
-      POSTGRES_DB: "${POSTGRES_DB}"
-      POSTGRES_USER: "${POSTGRES_USER}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      PGDATA: "/data/postgres"
+      POSTGRES_DB: "${POSTGRES_DB}" # Database name from environment variable
+      POSTGRES_USER: "${POSTGRES_USER}" # Username from environment variable
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}" # Password from environment variable
+      PGDATA: "/data/postgres" # Location of the PostgreSQL data files
     volumes:
-      - db_data/:/var/lib/postgresql/data/postgres:ro
-      - ./database/migration/init/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - db_data/:/var/lib/postgresql/data/postgres:ro # Mount a volume for database data in read-only mode
+      - ./database/migration/init/init.sql:/docker-entrypoint-initdb.d/init.sql # Initial SQL script for database setup
     env_file:
-      - .env
+      - .env # Load environment variables from .env file
     ports:
-      - "${POSTGRES_PORT_MAPPING}:${POSTGRES_PORT}"
+      - "${POSTGRES_PORT_MAPPING}:${POSTGRES_PORT}" # Map the container port to the host port
     networks:
-      - service_banking-network
+      - service_banking-network # Connect to the custom network
     healthcheck:
-      test:
-        [
+      test: [
           "CMD-SHELL",
-          "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'",
+          "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'", # Check if PostgreSQL is ready
         ]
-      interval: 10s
-      timeout: 3s
-      retries: 3
+      interval: 10s # Interval between health checks
+      timeout: 3s # Health check timeout
+      retries: 3 # Number of retries before marking the service as unhealthy
+
   # TODO: 2. GOLANG
   # App Service
   app:
     # Configuration for building the docker image for the service
     restart: unless-stopped
     build:
-      context: . # Use an image built from the specified dockerfile in the current directory.
-      dockerfile: ./docker/Dockerfile
+      context: . # Use the Dockerfile in the current directory to build the image
+      dockerfile: ./docker/Dockerfile # Specify the Dockerfile location
     env_file:
-      - .env
+      - .env # Load environment variables from .env file
+    environment:
+      ENV: "production" # Port for the service
     ports:
-      - "${PORT}:${PORT}" # Forward the exposed port 8080 on the container to port 8080 on the host machine
+      - "${PORT}:${PORT}" # Map the container port to the host port
     depends_on:
-      - postgresql # This service depends on postgresql. Start that first.
-    networks: # Networks to join (Services on the same network can communicate with each other using their name)
-      - service_banking-network
+      - postgresql # This service depends on PostgreSQL. Start PostgreSQL first.
+    networks:
+      - service_banking-network # Connect to the custom network
     healthcheck:
-      test:
-        ["CMD", "sh", "-c", "curl -sSf http://${HOST}:${PORT}/ping > /dev/null"]
-      interval: 60s
-      timeout: 2s
-      retries: 3
+      test: [
+          "CMD",
+          "sh",
+          "-c",
+          "curl -sSf http://${HOST}:${PORT}/ping > /dev/null",
+        ] # Health check to verify the app is running
+      interval: 60s # Interval between health checks
+      timeout: 2s # Health check timeout
+      retries: 3 # Number of retries before marking the service as unhealthy
 
 volumes:
   db_data:
-    driver: local
+    driver: local # Use local driver for the volume
 
 networks:
   service_banking-network:
-    driver: bridge
+    driver: bridge # Use bridge network driver
