@@ -35,19 +35,21 @@ func init() {
 }
 
 func Server() {
-	// Todo: TH1 used New
-	// server := gin.New()
-	// Manually add middleware
-	// server.Use(gin.Logger())
-	// server.Use(gin.Recovery())
-	// Todo: TH2 used Default
 	nodeEnv := os.Getenv("ENV")
-	if nodeEnv != constants.DEV {
+
+	var server *gin.Engine
+
+	if nodeEnv == constants.DEV {
+		server = gin.Default()
+	} else {
 		gin.SetMode(gin.ReleaseMode)
+		server = gin.New()
+		server.Use(gin.Logger())
+		server.Use(gin.Recovery())
 	}
 
-	server := gin.Default()
 	server.Use(middlewares.CORSMiddleware())
+	server.Use(middlewares.SecurityHeadersMiddleware())
 	server.Use(pkg.LogRequest)
 
 	port := os.Getenv("PORT")
