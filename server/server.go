@@ -82,7 +82,7 @@ func Pong(c *gin.Context) {
 func NotFound() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		errorResponse := error_response.NotFoundError("Not Found")
-		c.JSON(errorResponse.Status, errorResponse)
+		c.AbortWithStatusJSON(errorResponse.Status, errorResponse)
 	}
 }
 
@@ -103,6 +103,6 @@ func ServerError(c *gin.Context) {
 		}).Error(err)
 
 		errorResponse := error_response.ServiceUnavailable("Service Unavailable")
-		c.JSON(errorResponse.Status, errorResponse)
+		c.AbortWithStatusJSON(errorResponse.Status, errorResponse)
 	}
 }
