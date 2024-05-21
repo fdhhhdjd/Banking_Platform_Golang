@@ -37,6 +37,14 @@ func NotFoundError(message string) *ErrorResponse {
 	return NewErrorResponse(message, http.StatusNotFound)
 }
 
+// NoContentError represents a 404 Not Found error
+func NoContentError(message string) *ErrorResponse {
+	if message == "" {
+		message = http.StatusText(http.StatusNoContent)
+	}
+	return NewErrorResponse(message, http.StatusNoContent)
+}
+
 // UnauthorizedError represents a 401 Unauthorized error
 func UnauthorizedError(message string) *ErrorResponse {
 	if message == "" {

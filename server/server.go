@@ -46,6 +46,7 @@ func Server() {
 	}
 
 	server := gin.Default()
+	server.Use(CORSMiddleware())
 	server.Use(pkg.LogRequest)
 
 	port := os.Getenv("PORT")
@@ -77,6 +78,27 @@ func Pong(c *gin.Context) {
 		"message": message,
 		"time":    currentTime,
 	})
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, PUT, PATCH, DELETE, GET")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusMethodNotAllowed)
+			return
+		}
+
+		if c.Request.Method == "PUT" {
+			c.AbortWithStatus(http.StatusMethodNotAllowed)
+			return
+		}
+
+		c.Next()
+	}
 }
 
 func NotFound() gin.HandlerFunc {
