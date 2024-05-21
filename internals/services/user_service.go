@@ -233,8 +233,8 @@ func RenewToken(c *gin.Context) *models.RenewAccessTokenResponse {
 	//* Check Input
 	var req models.RenewAccessTokenRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		errorResponse := error_response.BadRequestError("Bad Request")
-		c.JSON(errorResponse.Status, errorResponse)
+		errorResponse := error_response.UnauthorizedError("")
+		c.AbortWithStatusJSON(errorResponse.Status, errorResponse)
 		return nil
 	}
 
@@ -248,8 +248,8 @@ func RenewToken(c *gin.Context) *models.RenewAccessTokenResponse {
 
 	RefreshPayload, err := JwtMaker.VerifyToken(req.RefreshToken)
 	if err != nil {
-		errorResponse := error_response.BadRequestError("Bad Request")
-		c.JSON(errorResponse.Status, errorResponse)
+		errorResponse := error_response.UnauthorizedError("")
+		c.AbortWithStatusJSON(errorResponse.Status, errorResponse)
 		return nil
 	}
 
@@ -301,7 +301,7 @@ func RenewToken(c *gin.Context) *models.RenewAccessTokenResponse {
 	accessTokenDurationStr := os.Getenv("ACCESS_TOKEN_DURATION")
 	accessTokenDuration, err := time.ParseDuration(accessTokenDurationStr)
 	if err != nil {
-		errorResponse := error_response.BadRequestError("Bad Request")
+		errorResponse := error_response.ForbiddenError("")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
@@ -312,7 +312,7 @@ func RenewToken(c *gin.Context) *models.RenewAccessTokenResponse {
 	)
 
 	if err != nil {
-		errorResponse := error_response.BadRequestError("Bad Request")
+		errorResponse := error_response.ForbiddenError("")
 		c.JSON(errorResponse.Status, errorResponse)
 		return nil
 	}
