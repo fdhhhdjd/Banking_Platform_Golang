@@ -45,3 +45,36 @@
 ```cmd
     go clean -testcache
 ```
+
+## 4. gRPC
+
+# ![ 4 Type gRPC](./assets/gRPC.png)
+
+# [Doc gRPC](https://grpc.io/docs/languages/go/quickstart/)
+
+```cmd
+    sudo apt install -y protobuf-compiler
+    protoc --version
+```
+
+```cmd
+    go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+    echo 'export PATH="$PATH:$(go env GOPATH)/bin"' >> ~/.bashrc
+    source ~/.bashrc
+    protoc-gen-go --version
+```
+
+```cmd
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+    protoc-gen-go-grpc --version
+```
+
+# settings > enter "proto3" > edit settings
+
+```cmd
+    "protoc": {
+        "options": ["--proto_path=protos"]
+    }
+```
+
+# ![Update Setting](./assets/setting-gRPC.png)
