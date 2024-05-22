@@ -4,9 +4,21 @@ package pb;
 import "google/api/annotations.proto";
 
 import "rpc_create_user.proto";
-import "rpc_login_user.proto"; // Add this import
+import "rpc_login_user.proto"; 
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/fdhhhdjd/Banking_Platform_Golang/pb";
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "Banking Platform Golang";
+        version: "1.2";
+        contact: {
+            name: "Class Teacher Tai";
+            url: "https://github.com/fdhhhdjd";
+            email: "nguyentientai10@gmail.com";
+        };
+    };
+};
 
 service SimpleBank {
     rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {

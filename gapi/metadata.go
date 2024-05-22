@@ -44,6 +44,5 @@ func (server *SimpleBankServer) extractMetadata(ctx context.Context) *Metadata {
 	if p, ok := peer.FromContext(ctx); ok {
 		mtdt.ClientIP = p.Addr.String()
 	}
-
 	return mtdt
 }
