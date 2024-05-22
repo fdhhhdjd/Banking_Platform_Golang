@@ -135,6 +135,10 @@ func StartGateWayGRPCServer() {
 	mux := http.NewServeMux()
 	mux.Handle("/", gwmux)
 
+	//* Swagger API
+	fs := http.FileServer(http.Dir("./docs/swagger"))
+	mux.Handle("/swagger/", http.StripPrefix("/swagger/", fs))
+
 	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Fatalf("Failed to listen Gateway: %v", err)
