@@ -10,14 +10,20 @@ import (
 	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/auth"
 	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/constants"
 	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/db"
+	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/val"
 	"github.com/fdhhhdjd/Banking_Platform_Golang/pb"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (server *SimpleBankServer) LoginUser(c context.Context, req *pb.LoginUserRequest) (*pb.LoginUserResponse, error) {
+	violations := ValidateLoginUserRequest(req)
 
+	if violations != nil {
+		return nil, InvalidArgumentError(violations)
+	}
 	store := db.GetStore()
 
 	user, err := store.GetUser(c, req.Username)
@@ -104,4 +110,16 @@ func (server *SimpleBankServer) LoginUser(c context.Context, req *pb.LoginUserRe
 		RefreshTokenExpiresAt: timestamppb.New(refreshPayload.ExpiredAt),
 	}
 	return rsp, nil
+}
+
+func ValidateLoginUserRequest(req *pb.LoginUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
+	if err := val.ValidateUsername(req.GetUsername()); err != nil {
+		violations = append(violations, FieldViolation("username", err))
+	}
+
+	if err := val.ValidatePassword(req.GetPassword()); err != nil {
+		violations = append(violations, FieldViolation("password", err))
+	}
+
+	return violations
 }
