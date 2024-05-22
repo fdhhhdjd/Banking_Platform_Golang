@@ -69,6 +69,14 @@
     protoc-gen-go-grpc --version
 ```
 
+```cmd
+    show service
+
+    package pb
+
+    service SimpleBank
+```
+
 # settings > enter "proto3" > edit settings
 
 ```cmd

@@ -95,7 +95,7 @@ func StartGRPCServer() {
 	}
 
 	log.Printf("gRPC server listening on port %s", port)
-	log.Printf("Registered gRPC services: %v", grpcServer.GetServiceInfo())
+	// log.Printf("Registered gRPC services: %v", grpcServer.GetServiceInfo())
 
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
