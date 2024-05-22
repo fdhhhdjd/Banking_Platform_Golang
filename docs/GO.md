@@ -121,3 +121,48 @@
     grpcurl -plaintext -d '{"username": "testuser", "password": "password"}' localhost:5005 pb.SimpleBank/LoginUser
 
 ```
+
+## 5. gRPC Gateway
+
+# ![gRPC + GateWay](./assets/gateway-gRPC.png)
+
+# [gRPC Gateway](https://github.com/grpc-ecosystem/grpc-gateway)
+
+# Create folder tools> tools.go >
+
+```go
+package tools
+
+import (
+    _ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway"
+    _ "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2"
+    _ "google.golang.org/grpc/cmd/protoc-gen-go-grpc"
+    _ "google.golang.org/protobuf/cmd/protoc-gen-go"
+)
+```
+
+# > go mod tidy >
+
+```cmd
+$ go install \
+    github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway \
+    github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2 \
+    google.golang.org/protobuf/cmd/protoc-gen-go \
+    google.golang.org/grpc/cmd/protoc-gen-go-grpc
+```
+
+# > Clone google api > https://github.com/googleapis/googleapis >
+
+# copy file need into source code banking of me
+
+```cmd
+    google/api/annotations.proto
+    google/api/field_behavior.proto
+    google/api/http.proto
+    google/api/httpbody.proto
+```
+
+```cmd
+    cp google/api/annotations.proto ~/Documents/Code/Banking-Platform-Golang/proto/google/api/
+    ...
+```

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"log"
 	"net"
 	"net/http"
@@ -19,9 +20,11 @@ import (
 	"github.com/fdhhhdjd/Banking_Platform_Golang/pb"
 	"github.com/fdhhhdjd/Banking_Platform_Golang/pkg"
 	"github.com/gin-gonic/gin"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/joho/godotenv"
 )
@@ -98,6 +101,47 @@ func StartGRPCServer() {
 	// log.Printf("Registered gRPC services: %v", grpcServer.GetServiceInfo())
 
 	if err := grpcServer.Serve(listener); err != nil {
+		log.Fatalf("Failed to serve: %v", err)
+	}
+}
+
+func StartGateWayGRPCServer() {
+	port := os.Getenv("GATE_WAY_GRPC_PORT")
+	if port == "" {
+		port = "5006"
+	}
+
+	// * Option get key for database not key to define
+	jsonOption := runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
+		MarshalOptions: protojson.MarshalOptions{
+			UseProtoNames: true,
+		},
+		UnmarshalOptions: protojson.UnmarshalOptions{
+			DiscardUnknown: true,
+		},
+	})
+
+	store := db.GetStore()
+	server := gapi.NewSimpleBankServer(*store)
+
+	gwmux := runtime.NewServeMux(jsonOption)
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	defer cancel()
+
+	pb.RegisterSimpleBankHandlerServer(ctx, gwmux, server)
+
+	mux := http.NewServeMux()
+	mux.Handle("/", gwmux)
+
+	listener, err := net.Listen("tcp", ":"+port)
+	if err != nil {
+		log.Fatalf("Failed to listen Gateway: %v", err)
+	}
+
+	log.Printf("Starting gRPC Gateway server on %s", listener.Addr().String())
+	if err := http.Serve(listener, mux); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
 	}
 }
