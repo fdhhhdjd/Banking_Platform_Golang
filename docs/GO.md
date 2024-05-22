@@ -78,3 +78,38 @@
 ```
 
 # ![Update Setting](./assets/setting-gRPC.png)
+
+# [Doc evans](https://github.com/ktr0731/evans)
+
+# Download evans and grpcurl
+
+```cmd
+    go install github.com/ktr0731/evans@latest
+```
+
+```cmd
+    evans --host localhost --port 5005 -r repl
+```
+
+```cmd
+    wget https://github.com/fullstorydev/grpcurl/releases/download/v1.7.0/grpcurl_1.7.0_linux_x86_64.tar.gz
+
+    tar -xvf grpcurl_1.7.0_linux_x86_64.tar.gz
+
+    chmod +x grpcurl
+
+    ./grpcurl -help
+
+    sudo mv grpcurl /usr/local/bin/
+```
+
+```cmd
+    grpcurl -plaintext localhost:5005 list
+
+    grpcurl -plaintext localhost:5005 describe pb.SimpleBank
+
+    grpcurl -plaintext -d '{"username": "testuser", "full_name": "Test User", "email": "test@example.com", "password": "password"}' localhost:5005 pb.SimpleBank/CreateUser
+
+    grpcurl -plaintext -d '{"username": "testuser", "password": "password"}' localhost:5005 pb.SimpleBank/LoginUser
+
+```

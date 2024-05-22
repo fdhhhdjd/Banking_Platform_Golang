@@ -49,5 +49,8 @@ proto:
 	protoc --proto_path=proto --go_out=pb --go_opt=paths=source_relative \
 	--go-grpc_out=pb --go-grpc_opt=paths=source_relative \
 	proto/*.proto
+
+evans:
+	evans -r repl --host localhost --port 5005
 	
-.PHONY: proto
+.PHONY: proto evans

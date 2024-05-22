@@ -2,6 +2,7 @@ package server
 
 import (
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"strconv"
@@ -10,13 +11,17 @@ import (
 	error_response "github.com/fdhhhdjd/Banking_Platform_Golang/api/handler/error"
 	"github.com/fdhhhdjd/Banking_Platform_Golang/api/middlewares"
 	config "github.com/fdhhhdjd/Banking_Platform_Golang/configs"
+	"github.com/fdhhhdjd/Banking_Platform_Golang/gapi"
 	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/constants"
 	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/db"
 	routes "github.com/fdhhhdjd/Banking_Platform_Golang/internals/routers"
 	util "github.com/fdhhhdjd/Banking_Platform_Golang/internals/utils"
+	"github.com/fdhhhdjd/Banking_Platform_Golang/pb"
 	"github.com/fdhhhdjd/Banking_Platform_Golang/pkg"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	"github.com/joho/godotenv"
 )
@@ -69,6 +74,31 @@ func Server() {
 	server.Use(ServerError)
 
 	server.Run(":" + port)
+}
+
+func StartGRPCServer() {
+	port := os.Getenv("GRPC_PORT")
+	if port == "" {
+		port = "5005"
+	}
+
+	store := db.GetStore()
+	grpcServer := grpc.NewServer()
+	pb.RegisterSimpleBankServer(grpcServer, gapi.NewSimpleBankServer(*store))
+
+	reflection.Register(grpcServer)
+
+	listener, err := net.Listen("tcp", ":"+port)
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+	}
+
+	log.Printf("gRPC server listening on port %s", port)
+	log.Printf("Registered gRPC services: %v", grpcServer.GetServiceInfo())
+
+	if err := grpcServer.Serve(listener); err != nil {
+		log.Fatalf("Failed to serve: %v", err)
+	}
 }
 
 func Pong(c *gin.Context) {
