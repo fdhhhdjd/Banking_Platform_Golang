@@ -82,6 +82,7 @@ func StartGRPCServer() {
 		port = "5005"
 	}
 
+	//* gRPC
 	store := db.GetStore()
 	grpcServer := grpc.NewServer()
 	pb.RegisterSimpleBankServer(grpcServer, gapi.NewSimpleBankServer(*store))
