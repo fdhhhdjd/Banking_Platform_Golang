@@ -31,7 +31,26 @@ services:
       timeout: 3s # Health check timeout
       retries: 3 # Number of retries before marking the service as unhealthy
 
-  # TODO: 2. GOLANG
+  # TODO: 2. REDIS
+  redis:
+    container_name: redis # Name of the Redis container
+    image: redis:latest
+    restart: always # Always restart the container if it stops
+    env_file:
+      - .env # Environment variables file
+    volumes:
+      - redis_data:/data # Volume for persistent storage
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT} # Port mapping
+    networks:
+      - service_banking-network # Network to connect to
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -h localhost ping"] # Health check command
+      interval: 30s # Time between health checks
+      timeout: 10s # Health check timeout
+      retries: 5 # Number of retries before considering the container as unhealthy
+
+  # TODO: 3. GOLANG
   # App Service
   app:
     # Configuration for building the docker image for the service
@@ -48,6 +67,7 @@ services:
       - "${PORT}:${PORT}" # Map the container port to the host port
     depends_on:
       - postgresql # This service depends on PostgreSQL. Start PostgreSQL first.
+      - redis # This service depends on Redis. Start Redis second.
     networks:
       - service_banking-network # Connect to the custom network
     healthcheck:
@@ -61,10 +81,14 @@ services:
       timeout: 2s # Health check timeout
       retries: 3 # Number of retries before marking the service as unhealthy
 
+  # Use local driver for the volume
 volumes:
   db_data:
-    driver: local # Use local driver for the volume
+    driver: local
+  redis_data:
+    driver: local
 
+# Use bridge network driver
 networks:
   service_banking-network:
-    driver: bridge # Use bridge network driver
+    driver: bridge

@@ -20,6 +20,9 @@ type Config struct {
 		Name     string
 		Ssl      string
 	}
+	Cache struct {
+		Link string
+	}
 }
 
 var AppConfig Config

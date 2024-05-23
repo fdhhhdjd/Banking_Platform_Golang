@@ -166,3 +166,7 @@ $ go install \
     cp google/api/annotations.proto ~/Documents/Code/Banking-Platform-Golang/proto/google/api/
     ...
 ```
+
+## 6. Worker
+
+# ![Worker](./assets/worker.png)

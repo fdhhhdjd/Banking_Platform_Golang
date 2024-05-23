@@ -43,6 +43,11 @@ migrateup:
 sereckey: 
 	node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
+################# CACHE #################
+redis-check:
+	docker exec -it redis redis-cli ping
+
+
 ################# gRPC #################
 proto:
 	rm -f pb/*.go
@@ -67,6 +72,8 @@ proto-swagger:
 	--openapiv2_out=docs/swagger --openapiv2_opt=allow_merge=true,merge_file_name=banking \
 	--experimental_allow_proto3_optional \
 	proto/*.proto
+
+
 
 evans:
 	evans -r repl --host localhost --port 5005

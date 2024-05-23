@@ -40,6 +40,9 @@ func init() {
 		log.Fatalf("Could not connect to the database: %v", err)
 	}
 
+	// Cache
+	db.Initialize()
+
 }
 
 func Server() {

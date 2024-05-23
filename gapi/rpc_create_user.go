@@ -10,6 +10,7 @@ import (
 	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/db"
 	"github.com/fdhhhdjd/Banking_Platform_Golang/internals/val"
 	"github.com/fdhhhdjd/Banking_Platform_Golang/pb"
+	"github.com/fdhhhdjd/Banking_Platform_Golang/worker"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -43,6 +44,16 @@ func (server *SimpleBankServer) CreateUser(c context.Context, req *pb.CreateUser
 			return nil, status.Errorf(codes.AlreadyExists, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, "failed to create user: %s", err)
+	}
+
+	taskPayload := &worker.PayloadSendVerifyEmail{
+		Username: user.Username,
+	}
+
+	err = db.TaskDistributor.DistributeTaskSendVerifyEmail(c, taskPayload)
+
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed send email: %s", err)
 	}
 
 	rsp := &pb.CreateUserResponse{
