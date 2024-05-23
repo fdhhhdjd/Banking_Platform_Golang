@@ -87,7 +87,8 @@ func StartGRPCServer() {
 
 	//* gRPC
 	store := db.GetStore()
-	grpcServer := grpc.NewServer()
+	gprcLogger := grpc.UnaryInterceptor(gapi.GrpcLogger)
+	grpcServer := grpc.NewServer(gprcLogger)
 	pb.RegisterSimpleBankServer(grpcServer, gapi.NewSimpleBankServer(*store))
 
 	reflection.Register(grpcServer)
