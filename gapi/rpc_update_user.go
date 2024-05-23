@@ -18,9 +18,18 @@ import (
 )
 
 func (server *SimpleBankServer) UpdateUser(c context.Context, req *pb.UpdateUserRequest) (*pb.UpdateUserResponse, error) {
+	authPayload, err := AuthorizeUser(c, []string{constants.BankerRole, constants.DepositorRole})
+	if err != nil {
+		return nil, unauthenticatedError(err)
+	}
+
 	violations := ValidateUpdateUserRequest(req)
 	if violations != nil {
 		return nil, InvalidArgumentError(violations)
+	}
+
+	if authPayload.Role != constants.BankerRole && authPayload.Username != req.GetUsername() {
+		return nil, status.Errorf(codes.PermissionDenied, "cannot update other user's info")
 	}
 
 	arg := database.UpdateUserParams{

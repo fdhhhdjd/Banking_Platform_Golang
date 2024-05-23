@@ -30,3 +30,8 @@ const (
 	AuthorizationTypeBearer = "bearer"
 	AuthorizationPayloadKey = "authorization_payload"
 )
+
+const (
+	DepositorRole = "depositor"
+	BankerRole    = "banker"
+)
