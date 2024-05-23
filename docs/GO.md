@@ -29,9 +29,15 @@
 
 ## Install lib
 
-```cmds
+```cmd
     go get <Github>
     go get github.com/google/uuid
+```
+
+## Uninstall lib
+
+```cmd
+    go get package@none
 ```
 
 ## Edit LIB
